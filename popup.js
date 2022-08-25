@@ -48,7 +48,7 @@ chrome.runtime.sendMessage({
             let timeNow = observedTabs[i][1][1];
             appendToList(timeNow, observedTabs, url);
         }
-    //});
+    
     } else {
         console.log("Message receive failed!");
     }

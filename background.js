@@ -1,5 +1,3 @@
-// loses all this as background script is cleared, so we need to store
-
 
 console.log("In the background");
 
@@ -73,7 +71,7 @@ function getCurrentUrl(callback) {
 
 }
 
-// set defaults
+
 chrome.runtime.onInstalled.addListener(() => {
     let time = Time(Date.now());
     chrome.storage.sync.set({ "time": time });
@@ -86,7 +84,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 });
 
-// runtime sends message to all foreground elements
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.message === 'get_url') {
         getObservedTabs((_observedTabs) => { 
@@ -105,7 +103,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 
-// updates time when active tab changes
+
 async function updateTime(tabUrl, time, identifier = 'startTime', iconUrl = '') {
 
     getObservedTabs((_observedTabs) => {
@@ -116,7 +114,7 @@ async function updateTime(tabUrl, time, identifier = 'startTime', iconUrl = '') 
 
         if (localObservedTabs.has(url)) {
             if (identifier === 'stopTime') {
-                // console.log('Setting stop time', url);
+               
                 let startTime = localObservedTabs.get(url)[0];
                 let newEndTime = time;
                 let icon = localObservedTabs.get(url)[2];
@@ -127,7 +125,6 @@ async function updateTime(tabUrl, time, identifier = 'startTime', iconUrl = '') 
                 observedTabs = Array.from(localObservedTabs);
             }
             else {
-                // console.log("Setting start time of already present url", url);
                 let prevStartTime = localObservedTabs.get(url)[0];
                 let prevEndTime = localObservedTabs.get(url)[1];
                 let icon = localObservedTabs.get(url)[2];
@@ -141,7 +138,6 @@ async function updateTime(tabUrl, time, identifier = 'startTime', iconUrl = '') 
 
 
         } else {
-            // console.log("Setting start time of new url", url);
             let startTime = Time(Date.now());
             let endTime = Time(Date.now());
             if (iconUrl === '') {
@@ -158,7 +154,6 @@ async function updateTime(tabUrl, time, identifier = 'startTime', iconUrl = '') 
 
 }
 
-// function to load current tab
 function getCurrentTab(_tabId) {
 
     chrome.tabs.get((_tabId),(response) => {
@@ -178,7 +173,6 @@ function getCurrentTab(_tabId) {
 
 
 
-// active tab changed
 chrome.tabs.onActivated.addListener((activeInfo) => {
     console.log('Active Tab');
     let tabId = activeInfo.tabId;
@@ -193,12 +187,10 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
     });
 });
 
-// url of current tab changed
 chrome.tabs.onUpdated.addListener((id, changeInfo, tab) => {
     console.log("Updated");
 
     if (changeInfo.hasOwnProperty('url')) {
-        // console.log(changeInfo.url, 'On url of tab changed');
         let m_currentTime = Time(Date.now());
         currentTime = m_currentTime;
 
@@ -210,14 +202,7 @@ chrome.tabs.onUpdated.addListener((id, changeInfo, tab) => {
     }
 });
 
-// // an existing window is closed
 
-// chrome.windows.onRemoved.addListener((id) => {
-// console.log("on window closed");
-
-// });
-
-// window switched
 chrome.windows.onFocusChanged.addListener((id) => {
     console.log("Window changed", id, new Date());
     let m_currentTime = Time(Date.now());
@@ -230,10 +215,7 @@ chrome.windows.onFocusChanged.addListener((id) => {
             currentTime = _currentTime;
     
             if (id !== chrome.windows.WINDOW_ID_NONE) {
-                //chrome.tabs.query({windowId: id, active: true}, (tab) => {
-                    //let id = tab[0].id;
-                    // console.log("WINDOW CHANGE!");
-
+                
                     getChromeState((_chromeState) => {
                         chromeState = _chromeState;
                         if (_chromeState === 'inactive') {
@@ -244,7 +226,7 @@ chrome.windows.onFocusChanged.addListener((id) => {
                         }
                         currentTab();
                     });
-                // });
+               
             } else {
 
                 getChromeState((_chromeState) => {
@@ -258,7 +240,7 @@ chrome.windows.onFocusChanged.addListener((id) => {
     });
 });
 
-// get currently focussed tab after state becomes active
+
 function currentTab() {
     chrome.tabs.getCurrent((tab) => {
         if (tab === undefined) {
@@ -266,13 +248,11 @@ function currentTab() {
         } else {
             let id = tab.id;
             getCurrentTab(id);
-            //updateTime(currentUrl, currentTime, 'startTime');
             console.log(newState, currentUrl, new Date());
         }
     });
 }
 
-// when all chrome windows lose focus/ different application gains focus
 chrome.idle.onStateChanged.addListener(newState => {
     console.log('Inside idle', newState, new Date());
     if (newState === "idle" || newState === "locked") {
@@ -291,7 +271,7 @@ chrome.idle.onStateChanged.addListener(newState => {
                         updateTime(_currentUrl, currentTime, 'stopTime');
                         console.log(newState, _currentUrl, new Date());              
                     });
-                //});
+                
             }
         });
 
